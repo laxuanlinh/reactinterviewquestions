@@ -278,3 +278,183 @@
     )
   }
   ```
+
+## `useReducer`
+- `useReducer` is similar to `useState` but more complex.
+- Internally, `useState` implements `useReducer`
+  ```jsx
+  export const ADD_TODO = "ADD_TODO";
+  export default reducer = (state, action) => {
+    switch(action.type) {
+      case: ADD_TODO:
+        const newTodo = {
+          name: "new todo"
+        };
+        return [...state, newTodo]
+    }
+  }
+  ```
+  ```jsx
+  import reducer, {ADD_TODO} from '.../reducers/reducer'
+  import {useReducer} from 'react'
+
+  export default function App() {
+    const initialState = [];
+    const [state, dispatch] = useReducer(reducer, initialState)
+    const handleAdd = () => {
+      dispatch(ADD_TODO);
+    }
+  }
+  ```
+
+## `useContext`
+- `useContext` is to share data between components.
+- When the data changes, all subscribers to that data are rerendered.
+- Redux only notifies the subscribers with the new state, the components are only rerendered if necessary
+- `useContext` is useful for seldomly changing variables or smaller applications
+- Redux is useful for larger applications 
+
+## `useMemo`
+- `useMemo` is to memorize the result of expensive calculation with respect to its dependencies
+- Both `useMemo` and useEffect can be used to recompute when dependencies change.
+- `useMemo` runs before `render` method so it can update variables before rendering.
+- `useEffect` runs after `render` method so it can update variables but it won't make a difference in UI.
+- To make a difference in UI, `useEffect` needs to update state to trigger a following re-rendering
+  ```jsx
+  export default function App() {
+    const [count, setCount] = useState(0);
+    // return the same cached calculation result if count does not change
+    const calculated = useMemo(() => expensiveCalculation(), [count])
+    const handleClick = () => {
+      setCount(count+1);
+    }
+    return (
+      <div>
+        {calculated}
+        <button onClick={handleClick}>Add</button>
+      </div>
+    )
+  }
+  ```
+
+- `useMemo` can prevent child re-rendering when parent's state changes, although the official documents recommend not to rely on it.
+  ```jsx
+  export default function App(){
+    const [count, setCount] = useState(0);
+    const handleClick = () => {
+      setCount(count+1);
+    }
+    const MemorizedChildComponent = useMemo(() => <ChildComponent />)
+    return (
+      <div>
+        {count}
+        <button onClick={handleClick}>Add</button>
+        {/*if count changes, this child is not rerendered*/}
+        { MemorizedChildComponent }
+      </div>
+    )
+  }
+  ```
+
+## `useCallback`
+- It's the same as `useMemo` except we don't pass the callback.
+- If we pass a callback then it returns a function
+  ```jsx
+  export default function App(){
+    const a = 5;
+    const b = 7;
+    let result = useCallback(a+b, [a, b]);
+    const add = useCallback(() => a+b, [a, b]);
+    useEffect(()=> {
+      result = add();
+    }, [])
+  }
+  ```
+
+## `useRef`
+- `useRef` is used to access DOM elements
+  ```jsx
+  export default function App(){
+    const divRef = useRef("")
+    //{current:""}
+    console.log(divRef);
+    useEffect(()=>{
+      //{current: <div class="some-div">}
+      console.log(devRef)
+    })
+    return (
+      <div className="some-div">
+      </div>
+    )
+  }
+  ```
+## `useLayoutEffect`
+- `useLayoutEffect` is similar to `useEffect`, fires after component mounts but does so synchronously instead of asynchronously like `useEffect`
+- Because it's synchronous, it's useful to do DOM mutation and can solve the flickering issue of `useEffect`
+- `useLayoutEffect` should only be used for DOM mutation, other things should be done by `useEffect`
+
+## `useSelector` and `useDispatch`
+- These are hooks in Redux React library to access the global state and trigger actions in reducers.
+
+## `useHistory`
+- A hook from Router library used to redirect.
+  ```jsx
+  import {useHistory} from 'react-router-dom';
+
+  export default function App(){
+    const history = useHistory();
+    const pushToPage = (id) => {
+      history.push(`/employees/${id}`);
+    }
+  }
+  ```
+
+## `useLocation`
+- Another hook from Router library to get parameters from the URL
+  ```jsx
+  import {useLocation} from 'react-router-dom';
+
+  export default function App(){
+    const location = useLocation();
+    console.log(location);
+    // {
+    //   pathname: '/employees/1',
+    //   search: '?some=search-string',
+    //   hash: '#howdy',
+    //   state: undefined
+    // }
+  }
+  ```
+
+## `useParams`
+- Similar to `useLocation`, `useParams` can be used to access the path parameter of the URL
+  ```jsx
+  import {useParams} from 'react-router-dom';
+  export default function App(){
+    const params = useParams();
+    // the path in Route is /employees/:id
+    // the url is /employees/1
+    console.log(params);
+    // {id: "1"}
+  }
+  ```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
